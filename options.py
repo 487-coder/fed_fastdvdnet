@@ -11,7 +11,7 @@ def args_parser():
                         help='client number')
     parser.add_argument('--test_dataset', default='./480p',
                         help='test file root')
-    parser.add_argument('--patch_size',type= int default=96,
+    parser.add_argument('--patch_size',type= int, default=96,
                         help='Patch size')
     parser.add_argument("--batch_size", type=int, default=64,
                         help="Training batch size")
