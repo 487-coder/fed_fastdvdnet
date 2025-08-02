@@ -164,6 +164,10 @@ def frame_denoise(model, noise_frame, sigma_map, context):
 
 
 def denoise_seq_fastdvdnet(seq, noise_std, model, temporal_window=5, is_training=False):
+    # 如果 seq 是 [1, T, C, H, W]，则 squeeze 成 [T, C, H, W]
+    if seq.dim() == 5 and seq.shape[0] == 1:
+        seq = seq.squeeze(0)
+
     frame_num, c, h, w = seq.shape
     center = (temporal_window - 1) // 2
     denoise_frames = torch.empty_like(seq).to(seq.device)

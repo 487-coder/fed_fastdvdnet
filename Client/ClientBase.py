@@ -44,9 +44,9 @@ class Client(object):
         with torch.no_grad():
             for batch_idx, seq in enumerate(self.testloader):
                 seq = seq.to(self.device)
-                noise = torch.empty_like(seq).normal_(mean=0, std=self.noise_level).to(self.device)
+                noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
                 noisy_seq = seq + noise
-                noise_map = torch.tensor([self.noise_level], dtype=torch.float32).to(self.device)
+                noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
 
                 denoised_seq = denoise_seq_fastdvdnet(
                     seq=noisy_seq,
