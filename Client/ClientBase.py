@@ -43,25 +43,29 @@ class Client(object):
         cnt = 0
         with torch.no_grad():
             for batch_idx, seq in enumerate(self.testloader):
-                seq = seq.to(self.device)
+                seq = seq.to(self.device)  # [1, T, C, H, W]
                 if seq.dim() == 5 and seq.shape[0] == 1:
                     seq = seq.squeeze(0)  # [T, C, H, W]
+
                 noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
                 noisy_seq = seq + noise
+
                 noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
 
                 denoised_seq = denoise_seq_fastdvdnet(
                     seq=noisy_seq,
                     noise_std=noise_map,
                     temporal_window=self.args.temp_psz,
-                    model=self.model
+                    model=self.model.module if isinstance(self.model, nn.DataParallel) else self.model
                 )
-                #print(f"[DEBUG] denoised_seq: min={denoised_seq.min().item():.4f}, max={denoised_seq.max().item():.4f}")
 
-                psnr = batch_psnr(denoised_seq, seq, data_range=1.0)
+                # 只评估中心帧
+                gt = seq[self.ctrl_fr_idx].unsqueeze(0)
+                pred = denoised_seq[self.ctrl_fr_idx].unsqueeze(0)
+                psnr = batch_psnr(pred, gt, data_range=1.0)
                 total_psnr += psnr
                 cnt += 1
-                print(total_psnr / cnt)
+                print(f"[Client {self.idx}] PSNR on sample {cnt}: {psnr:.2f}")
         return total_psnr / cnt
 
     def load_model(self, global_weights):
