@@ -19,6 +19,7 @@ class Server(object):
         self.client_noise_type = client_noise_type
         self.local_test_dataloader = local_test_dataloader
         self.global_test_dataloader = global_test_dataloader
+        self.ctrl_fr_idx = (self.args.temp_psz - 1) // 2
         self.logger = logger
         self.device = device
         self.LocalModels = []
@@ -36,6 +37,7 @@ class Server(object):
 
             noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
             noisy_seq = seq + noise
+            noisy_seq = torch.clamp(noisy_seq, 0.0, 1.0)
 
             noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
 

@@ -50,7 +50,7 @@ class ClientFedAvg(Client):
                )
                noise = torch.normal(mean=0.0, std=stdn.expand_as(img_train))
                imgn_train = img_train + noise
-
+               imgn_train = torch.clamp(imgn_train, 0.0, 1.0)
                noise_map = stdn.expand((N, 1, H, W)).to(self.device)
                out_train = self.model(imgn_train, noise_map)
                loss = criterion(out_train, gt_train) / (N * 2)

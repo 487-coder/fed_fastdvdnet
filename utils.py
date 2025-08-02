@@ -17,6 +17,7 @@ class Normalize(nn.Module):
     def forward(self, x):
         print("cnm",x.shape)
         #x = x.float() / 255.0
+        x = x.float()
         n, f, c, h, w = x.shape
         return x.view(n, f * c, h, w)
 

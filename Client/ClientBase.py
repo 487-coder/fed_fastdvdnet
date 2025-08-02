@@ -31,7 +31,7 @@ class Client(object):
         self.noise_type = noise_type
         self.idx = idx
         self.criterion = nn.MSELoss(reduction='sum')
-
+        self.ctrl_fr_idx = (self.args.temp_psz - 1) // 2
         self.device = device
         #self.kld = nn.KLDivLoss()
         #self.mse = nn.MSELoss()
@@ -49,7 +49,7 @@ class Client(object):
 
                 noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
                 noisy_seq = seq + noise
-
+                noisy_seq = torch.clamp(noisy_seq, 0.0, 1.0)
                 noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
 
                 denoised_seq = denoise_seq_fastdvdnet(
