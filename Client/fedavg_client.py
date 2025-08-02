@@ -2,12 +2,13 @@ import copy
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
-
-from utils import normalize_augment, orthogonal_conv_weights
 
 
-class ClientFedAvg:
+from utils import normalize_augment
+from Client.ClientBase import Client
+
+
+class ClientFedAvg(Client):
     def __init__(self, args, model, trainloader, noise_level,noise_type,testloader, idx, logger, device):
         '''self.LocalModels.append(ClientFedAvg(self.args, copy.deepcopy(self.global_model), self.client_dataloader[idx],
                                                  self.client_noise_level, self.client_noise_type,

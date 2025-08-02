@@ -1,7 +1,6 @@
-from torch.utils.data import Dataset
+
 import torch
-import copy
-#from utils import Accuracy
+
 from utils import batch_psnr
 from fastdvd_model import denoise_seq_fastdvdnet
 

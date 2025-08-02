@@ -1,12 +1,7 @@
-import numpy as np
-import torch
 
-from torch.utils.data import Dataset
 import torch
 import copy
 import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
 
 from fastdvd_model import denoise_seq_fastdvdnet
 from utils import batch_psnr
@@ -47,7 +42,7 @@ class Client(object):
         total_psnr = 0.0
         cnt = 0
         with torch.no_grad():
-            for batch_idx, (seq,) in enumerate(self.testloader):
+            for batch_idx, seq in enumerate(self.testloader):
                 seq = seq.to(self.device)
                 noise = torch.empty_like(seq).normal_(mean=0, std=self.noise_level).to(self.device)
                 noisy_seq = seq + noise

@@ -65,9 +65,9 @@ server = ServerFedAvg(args,global_model,client_dataloader,args.client_noise_leve
     def __init__(self, args, global_model, client_dataloader, client_noise_level, client_noise_type,local_test_dataloader, global_test_dataloader, logger, device):
         super().__init__(args, global_model, client_dataloader,client_noise_level, client_noise_type, local_test_dataloader, global_test_dataloader, logger, device)
 '''
-server.Create_Clints()
+server.Create_Clients()
 server.train()
-server.global_test_accuracy()
+server.global_test_psnr()
 
 save_path = checkpoint_dir + '.pth'
 if args.upload_model == True:

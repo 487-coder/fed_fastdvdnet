@@ -1,4 +1,4 @@
-import os
+
 import random
 from pathlib import Path
 from torch.utils.data import Subset, Dataset
@@ -6,7 +6,7 @@ import numpy as np
 import imageio.v3 as iio
 import torch
 from torchvision import transforms as T
-from get_dataset import Train_dataset
+
 from utils import open_sequence
 VALSEQPATT = '*'
 NUMFRXSEQ_VAL = 15

@@ -1,5 +1,5 @@
 import copy
-#from utils import Accuracy
+
 from Server.ServerBase import Server
 from Client.fedavg_client import ClientFedAvg
 from tqdm import tqdm

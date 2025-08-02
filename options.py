@@ -7,7 +7,7 @@ def args_parser():
     # Data specifc paremeters
     parser.add_argument('--train_dataset', default='./mp4',
                         help='train file root')
-    parser.add_argument('--client_numbers', default='10',
+    parser.add_argument('--client_numbers', default=10,
                         help='client number')
     parser.add_argument('--test_dataset', default='./480p',
                         help='test file root')
