@@ -81,7 +81,7 @@ class LocalDataset(Dataset):
         i, j, h, w = T.RandomCrop.get_params(seq[0], output_size=(self.crop_size, self.crop_size))
         seq = seq[:, :, i:i + h, j:j + w]  # [F, C, Hc, Wc]
         # 中心帧 GT： [1, C, H, W]
-        gt = seq[:, self.half]  # 取第 self.half 帧
+        gt = seq[self.half]  # 取第 self.half 帧
         return seq, gt
 
 class TestDataset(Dataset):

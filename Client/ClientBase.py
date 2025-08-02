@@ -56,7 +56,7 @@ class Client(object):
                     temporal_window=self.args.temp_psz,
                     model=self.model
                 )
-                print(f"[DEBUG] denoised_seq: min={denoised_seq.min().item():.4f}, max={denoised_seq.max().item():.4f}")
+                #print(f"[DEBUG] denoised_seq: min={denoised_seq.min().item():.4f}, max={denoised_seq.max().item():.4f}")
 
                 psnr = batch_psnr(denoised_seq, seq, data_range=1.0)
                 total_psnr += psnr

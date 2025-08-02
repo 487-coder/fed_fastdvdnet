@@ -58,17 +58,18 @@ class ClientFedAvg(Client):
                if self.args.clip_grad is not None:
                    nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=self.args.clip_grad)
                optimizer.step()
-               '''
+
 
                if batch_idx % 10 == 0:
                    print(f"| Global Round: {global_round} | Client: {self.idx} | Local Epoch: {epoch} | "
                          f"[{batch_idx * len(img_train)}/{len(self.trainloader.dataset)} ({100. * batch_idx / len(self.trainloader):.0f}%)] "
                          f"\tLoss: {loss.item():.6f}")
                    self.logger.add_scalar('loss', loss.item())
-                '''
+                   '''
                print(f"| Global Round: {global_round} | Client: {self.idx} | Local Epoch: {epoch} | "
                      f"[{batch_idx * len(img_train)}/{len(self.trainloader.dataset)} ({100. * batch_idx / len(self.trainloader):.0f}%)] "
                      f"\tLoss: {loss.item():.6f}")
+                '''
 
                batch_loss.append(loss.item())
 
