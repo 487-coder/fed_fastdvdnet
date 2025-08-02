@@ -44,6 +44,8 @@ class Client(object):
         with torch.no_grad():
             for batch_idx, seq in enumerate(self.testloader):
                 seq = seq.to(self.device)
+                if seq.dim() == 5 and seq.shape[0] == 1:
+                    seq = seq.squeeze(0)  # [T, C, H, W]
                 noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
                 noisy_seq = seq + noise
                 noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
@@ -54,10 +56,12 @@ class Client(object):
                     temporal_window=self.args.temp_psz,
                     model=self.model
                 )
+                print(f"[DEBUG] denoised_seq: min={denoised_seq.min().item():.4f}, max={denoised_seq.max().item():.4f}")
 
                 psnr = batch_psnr(denoised_seq, seq, data_range=1.0)
                 total_psnr += psnr
                 cnt += 1
+                print(total_psnr / cnt)
         return total_psnr / cnt
 
     def load_model(self, global_weights):

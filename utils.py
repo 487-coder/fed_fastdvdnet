@@ -137,7 +137,7 @@ def open_sequence(seq_dir, gray_mode, expand_if_needed=False, max_num_fr=100):
     file_paths = get_image_names(seq_dir)
     file_paths = file_paths[:max_num_fr]
 
-    print(f"Open sequence in folder: {seq_dir} ({len(file_paths)} frames)")
+    #print(f"Open sequence in folder: {seq_dir} ({len(file_paths)} frames)")
 
     seq_list = []
     expanded_h, expanded_w = False, False

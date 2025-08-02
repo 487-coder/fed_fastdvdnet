@@ -30,15 +30,19 @@ class Server(object):
         cnt = 0
         for idx, (seq,) in enumerate(self.global_test_dataloader):
             seq = seq.to(self.device)
+            if seq.dim() == 5 and seq.shape[0] == 1:
+                seq = seq.squeeze(0)  # [T, C, H, W]
             noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
             noisy_seq = seq + noise
             noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
             with torch.no_grad():
-                denoised_seq = denoise_seq_fastdvdnet(seq = denoised_seq,
+                denoised_seq = denoise_seq_fastdvdnet(seq = noisy_seq,
                                                        noise_std = noise_map,
                                                        temporal_window=self.args.temp_psz,  # e.g. 5
                                                        model=self.global_model
                                                        )
+                print(f"[DEBUG] denoised_seq: min={denoised_seq.min().item():.4f}, max={denoised_seq.max().item():.4f}")
+
             psnr_clean = batch_psnr(denoised_seq, seq, data_range=1.0)
             psnr_noisy = batch_psnr(noisy_seq.squeeze(), seq, data_range=1.0)
 
@@ -46,7 +50,7 @@ class Server(object):
             total_noisy_psnr += psnr_noisy
             cnt += 1
 
-            self.logger.info(f"[{idx}] PSNR_noisy: {psnr_noisy:.4f} dB | PSNR_denoised: {psnr_clean:.4f} dB")
+            #self.logger.info(f"[{idx}] PSNR_noisy: {psnr_noisy:.4f} dB | PSNR_denoised: {psnr_clean:.4f} dB")
 
         avg_psnr = total_psnr / cnt
         avg_psnr_noisy = total_noisy_psnr / cnt
