@@ -36,12 +36,11 @@ global_testset = TestDataset(data_dir=args.test_dataset)
 global_testloader = DataLoader(global_testset, batch_size=1)
 
 client_dataset = {}
-client_testset = {}
+client_testset = partition_test_dataset(global_testset,args.client_numbers)
 client_dataloader = {}
 client_test_dataloader = {}
 for i in range(args.client_numbers):
     client_dataset[i] = LocalDataset(client_dataset_path[i],sequence_length= 5, crop_size=args.patch_size)
-    client_testset[i] = partition_test_dataset(global_testset,args.client_numbers)
     client_dataloader[i] = DataLoader(client_dataset[i],batch_size=args.batch_size,shuffle=False,num_workers=4)
     client_test_dataloader[i] = DataLoader(client_testset[i],batch_size=1)
 
