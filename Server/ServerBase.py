@@ -54,6 +54,8 @@ class Server(object):
             gt = seq[self.ctrl_fr_idx].unsqueeze(0)
             pred = denoised_seq[self.ctrl_fr_idx].unsqueeze(0)
             noisy_center = noisy_seq[self.ctrl_fr_idx].unsqueeze(0)
+            print("GT min/max:", gt.min().item(), gt.max().item())
+            print("Pred min/max:", pred.min().item(), pred.max().item())
 
             psnr_clean = batch_psnr(pred, gt, data_range=1.0)
             psnr_noisy = batch_psnr(noisy_center, gt, data_range=1.0)
