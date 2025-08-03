@@ -46,9 +46,11 @@ class ClientFedAvg(Client):
                gt_train = gt_train.to(self.device, non_blocking=True)
                N, _, H, W = img_train.size()
                stdn = torch.empty((N, 1, 1, 1), device=self.device).uniform_(
-                   self.noise_level [0], self.noise_level[1]
+                   self.noise_level [0]/255.0, self.noise_level[1]/255.0
                )
                noise = torch.normal(mean=0.0, std=stdn.expand_as(img_train))
+               #print("testValue")
+               #print(img_train.max(), img_train.min())
                imgn_train = img_train + noise
                imgn_train = torch.clamp(imgn_train, 0.0, 1.0)
                noise_map = stdn.expand((N, 1, H, W)).to(self.device)

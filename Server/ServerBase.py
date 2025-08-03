@@ -1,5 +1,6 @@
 
 import torch
+from torch import nn
 
 from utils import batch_psnr
 from fastdvd_model import denoise_seq_fastdvdnet
@@ -35,11 +36,11 @@ class Server(object):
             if seq.dim() == 5 and seq.shape[0] == 1:
                 seq = seq.squeeze(0)  # [T, C, H, W]
 
-            noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
+            noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise/255.0).to(self.device)
             noisy_seq = seq + noise
             noisy_seq = torch.clamp(noisy_seq, 0.0, 1.0)
 
-            noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
+            noise_map = torch.tensor([self.args.test_noise/255.0], dtype=torch.float32).to(self.device)
 
             with torch.no_grad():
                 denoised_seq = denoise_seq_fastdvdnet(
@@ -54,8 +55,8 @@ class Server(object):
             gt = seq[self.ctrl_fr_idx].unsqueeze(0)
             pred = denoised_seq[self.ctrl_fr_idx].unsqueeze(0)
             noisy_center = noisy_seq[self.ctrl_fr_idx].unsqueeze(0)
-            print("GT min/max:", gt.min().item(), gt.max().item())
-            print("Pred min/max:", pred.min().item(), pred.max().item())
+            #print("GT min/max:", gt.min().item(), gt.max().item())
+            #print("Pred min/max:", pred.min().item(), pred.max().item())
 
             psnr_clean = batch_psnr(pred, gt, data_range=1.0)
             psnr_noisy = batch_psnr(noisy_center, gt, data_range=1.0)

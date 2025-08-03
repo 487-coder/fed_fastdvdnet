@@ -47,10 +47,10 @@ class Client(object):
                 if seq.dim() == 5 and seq.shape[0] == 1:
                     seq = seq.squeeze(0)  # [T, C, H, W]
 
-                noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise).to(self.device)
+                noise = torch.empty_like(seq).normal_(mean=0, std=self.args.test_noise/255.0).to(self.device)
                 noisy_seq = seq + noise
                 noisy_seq = torch.clamp(noisy_seq, 0.0, 1.0)
-                noise_map = torch.tensor([self.args.test_noise], dtype=torch.float32).to(self.device)
+                noise_map = torch.tensor([self.args.test_noise/255.0], dtype=torch.float32).to(self.device)
 
                 denoised_seq = denoise_seq_fastdvdnet(
                     seq=noisy_seq,
