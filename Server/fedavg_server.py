@@ -45,6 +45,7 @@ class ServerFedAvg(Server):
 
             # update global weights
             global_weights = average_weights(local_weights)
+            self.global_model.load_state_dict(global_weights)
 
             loss_avg = sum(local_losses) / len(local_losses)
             train_loss.append(loss_avg)
@@ -71,6 +72,5 @@ class ServerFedAvg(Server):
                 role='global'
             )
         print('Training is completed.')
-        self.global_model.load_state_dict(global_weights)
         end_time = time.time()
 
