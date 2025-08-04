@@ -47,12 +47,12 @@ for i in range(args.client_numbers):
 
 
 logger = SummaryWriter('./logs')
-checkpoint_dir = './checkpoint/'+ args.train_dataset + '/'
-if not os.path.exists(checkpoint_dir):
-    os.makedirs(checkpoint_dir)
-with open(checkpoint_dir+'args.pkl', 'wb') as fp:
+args.save_dir = './checkpoint/'+ args.train_dataset + '/'
+if not os.path.exists(args.save_dir):
+    os.makedirs(args.save_dir)
+with open(args.save_dir+'args.pkl', 'wb') as fp:
     pickle.dump(args, fp)
-print('Checkpoint dir:', checkpoint_dir)
+print('Checkpoint dir:', args.save_dir)
 
 
 global_model = FastDVDnet()
@@ -67,8 +67,8 @@ server = ServerFedAvg(args,global_model,client_dataloader,args.client_noise_leve
 server.Create_Clients()
 server.train()
 server.global_test_psnr()
-
-save_path = checkpoint_dir + '.pth'
+logger.close()
+save_path = args.save_dir + '.pth'
 if args.upload_model == True:
     server.Save_CheckPoint(save_path)
     print('Model is saved on: ')

@@ -205,3 +205,47 @@ def average_weights(w):
             w_avg[key] += w[i][key]
         w_avg[key] = torch.div(w_avg[key], len(w))
     return w_avg
+
+
+def save_model_checkpoint(model, config, optimizer, train_pars, epoch, role="global", client_id=None):
+    """
+    Save model and optimizer state dicts.
+
+    Args:
+        model: torch.nn.Module
+        config: dict, contains training configuration including 'log_dir' and 'save_every_epochs'
+        optimizer: torch.optim.Optimizer
+        train_pars: dict, training info like epoch, loss, etc.
+        epoch: int
+        role: 'client' or 'global'
+        client_id: int, required if role is 'client'
+    """
+    assert role in ["client", "global"], "role must be 'client' or 'global'"
+
+    # === Set subdirectory path ===
+    if role == "client":
+        assert client_id is not None, "client_id must be provided when role is 'client'"
+        log_dir = Path(config['log_dir']) / f"client_{client_id}"
+    else:
+        log_dir = Path(config['log_dir']) / "global"
+
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    # === Save model only for inference ===
+    torch.save(model.state_dict(), log_dir / 'net.pth')
+
+    # === Save full checkpoint for resume training ===
+    save_dict = {
+        'state_dict': model.state_dict(),
+        'optimizer': optimizer.state_dict() if optimizer is not None else None,
+        'training_params': train_pars,
+        'args': config
+    }
+
+    torch.save(save_dict, log_dir / 'ckpt.pth')
+
+    if epoch % config['save_every_epochs'] == 0:
+        epoch_ckpt_path = log_dir / f'ckpt_e{epoch + 1}.pth'
+        torch.save(save_dict, epoch_ckpt_path)
+
+    del save_dict

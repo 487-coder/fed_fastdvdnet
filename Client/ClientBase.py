@@ -62,8 +62,8 @@ class Client(object):
                 # 只评估中心帧
                 gt = seq[self.ctrl_fr_idx].unsqueeze(0)
                 pred = denoised_seq[self.ctrl_fr_idx].unsqueeze(0)
-                print("GT min/max:", gt.min().item(), gt.max().item())
-                print("Pred min/max:", pred.min().item(), pred.max().item())
+                #print("GT min/max:", gt.min().item(), gt.max().item())
+                #print("Pred min/max:", pred.min().item(), pred.max().item())
 
                 psnr = batch_psnr(pred, gt, data_range=1.0)
                 total_psnr += psnr

@@ -7,7 +7,7 @@ import numpy as np
 from utils import average_weights
 from utils import MemReporter
 import time
-
+from utils import save_model_checkpoint
 
 class ServerFedAvg(Server):
     def __init__(self, args, global_model, client_dataloader, client_noise_level, client_noise_type,local_test_dataloader, global_test_dataloader, logger, device):
@@ -40,7 +40,8 @@ class ServerFedAvg(Server):
                 local_weights.append(copy.deepcopy(w))
                 local_psnr = self.LocalModels[idx].test_psnr()
                 global_psnr += local_psnr
-
+                self.logger.add_scalar(f'Client_{idx}/Loss', loss, epoch)
+                self.logger.add_scalar(f'Client_{idx}/PSNR', local_psnr, epoch)
 
             # update global weights
             global_weights = average_weights(local_weights)
@@ -49,6 +50,22 @@ class ServerFedAvg(Server):
             train_loss.append(loss_avg)
             print("average loss:  ", loss_avg)
             print('average test psnr:', global_psnr / m)
+            self.logger.add_scalar('Global/Average_Loss', loss_avg, epoch)
+            self.logger.add_scalar('Global/Average_PSNR', global_psnr / m, epoch)
+            save_model_checkpoint(
+                model=self.global_model,
+                config={
+                    'log_dir': self.args.save_dir,
+                    'save_every_epochs': 1  # 每轮都保存，也可以换成比如5
+                },
+                optimizer=None,  # 没有使用server端optimizer就设为None
+                train_pars={
+                    'epoch_loss': loss_avg,
+                    'epoch': epoch
+                },
+                epoch=epoch,
+                role='global'
+            )
         print('Training is completed.')
         self.global_model.load_state_dict(global_weights)
         end_time = time.time()

@@ -2,6 +2,7 @@ import copy
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from utils import save_model_checkpoint
 
 
 from utils import normalize_augment
@@ -67,15 +68,23 @@ class ClientFedAvg(Client):
                          f"[{batch_idx * len(img_train)}/{len(self.trainloader.dataset)} ({100. * batch_idx / len(self.trainloader):.0f}%)] "
                          f"\tLoss: {loss.item():.6f}")
                    self.logger.add_scalar('loss', loss.item())
-                   '''
-               print(f"| Global Round: {global_round} | Client: {self.idx} | Local Epoch: {epoch} | "
-                     f"[{batch_idx * len(img_train)}/{len(self.trainloader.dataset)} ({100. * batch_idx / len(self.trainloader):.0f}%)] "
-                     f"\tLoss: {loss.item():.6f}")
-                '''
 
                batch_loss.append(loss.item())
 
            epoch_loss.append(sum(batch_loss) / len(batch_loss))
+
+           save_model_checkpoint(
+                model=self.model,
+                config={
+                   'log_dir': self.args.save_dir,
+                   'save_every_epochs': 1  # 每轮都保存，或自定义
+                },
+                optimizer=optimizer,
+                train_pars={'epoch_losses': epoch_loss[-1], 'epoch': global_round},
+                epoch=global_round,
+                role="client",
+                client_id=self.idx
+               )
 
         return self.model.state_dict(), sum(epoch_loss) / len(epoch_loss)
 

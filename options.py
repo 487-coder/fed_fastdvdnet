@@ -35,6 +35,7 @@ def args_parser():
                         help='iterations of local updating')
     parser.add_argument('--clip_grad', type=float, default=None,
                         help='gadient clipping')
-
+    parser.add_argument('--save_dir',  default=None,
+                        help='save model path')
     args = parser.parse_args()
     return args
