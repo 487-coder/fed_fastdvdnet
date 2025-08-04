@@ -71,7 +71,9 @@ class Server(object):
         avg_psnr_noisy = total_noisy_psnr / cnt
 
         print(f"\n[Global Test PSNR] Clean: {avg_psnr:.4f} dB | Noisy: {avg_psnr_noisy:.4f} dB\n")
-        self.logger.info(f"[Global Test PSNR] Clean: {avg_psnr:.4f} dB | Noisy: {avg_psnr_noisy:.4f} dB")
+
+        return avg_psnr, avg_psnr_noisy
+
 
     def Save_CheckPoint(self, save_path):
         torch.save(self.global_model.state_dict(), save_path)

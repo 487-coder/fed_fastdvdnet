@@ -77,7 +77,7 @@ class ClientFedAvg(Client):
                 model=self.model,
                 config={
                    'log_dir': self.args.save_dir,
-                   'save_every_epochs': 1  # 每轮都保存，或自定义
+                   'save_every_epochs': 5  # 每轮都保存，或自定义
                 },
                 optimizer=optimizer,
                 train_pars={'epoch_losses': epoch_loss[-1], 'epoch': global_round},

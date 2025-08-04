@@ -21,7 +21,7 @@ class ServerFedAvg(Server):
                                                  device=self.device))#这里后面要加noise_level,noise_type
 
     def train(self):
-        reporter = MemReporter()
+
         start_time = time.time()
         train_loss = []
         global_weights = self.global_model.state_dict()
@@ -52,11 +52,15 @@ class ServerFedAvg(Server):
             print('average test psnr:', global_psnr / m)
             self.logger.add_scalar('Global/Average_Loss', loss_avg, epoch)
             self.logger.add_scalar('Global/Average_PSNR', global_psnr / m, epoch)
+            if (epoch + 1) % 5 == 0 or epoch == 0:
+                global_test_psnr, global_psnr_noisy = self.global_test_psnr()
+                self.logger.add_scalar('Global/Test_PSNR', global_test_psnr, epoch)
+                self.logger.add_scalar('Global/Test_PSNR_Noisy', global_psnr_noisy, epoch)
             save_model_checkpoint(
                 model=self.global_model,
                 config={
                     'log_dir': self.args.save_dir,
-                    'save_every_epochs': 1  # 每轮都保存，也可以换成比如5
+                    'save_every_epochs': 5  # 每轮都保存，也可以换成比如5
                 },
                 optimizer=None,  # 没有使用server端optimizer就设为None
                 train_pars={
@@ -69,5 +73,4 @@ class ServerFedAvg(Server):
         print('Training is completed.')
         self.global_model.load_state_dict(global_weights)
         end_time = time.time()
-        print('running time: {} s '.format(end_time - start_time))
-        reporter.report()
+
