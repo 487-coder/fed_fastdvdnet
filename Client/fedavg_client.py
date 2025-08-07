@@ -25,13 +25,14 @@ class ClientFedAvg(Client):
         self.device = device
 
         self.ctrl_fr_idx = (self.args.temp_psz - 1) // 2
-        self.criterion = nn.MSELoss(reduction='sum').to(device)
+        self.criterion = nn.MSELoss(reduction='mean').to(device)
 
     def update_weights(self, global_round,lr):
         self.model.to(self.device)
         self.model.train()
 
-        optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=0.9)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=lr
+                                     )
 
         criterion = self.criterion.to(self.device)
 

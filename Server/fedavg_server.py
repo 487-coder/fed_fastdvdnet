@@ -26,7 +26,7 @@ class ServerFedAvg(Server):
         train_loss = []
         global_weights = self.global_model.state_dict()
         for epoch in tqdm(range(self.args.num_epochs)):
-            current_lr = self.args.lr * (0.1 ** (epoch // 2))
+            current_lr = self.args.lr * (0.1 ** (epoch // 3))
             #test_accuracy = 0
             global_psnr = 0
             local_weights, local_losses = [], []
@@ -54,7 +54,7 @@ class ServerFedAvg(Server):
             print('average test psnr:', global_psnr / m)
             self.logger.add_scalar('Global/Average_Loss', loss_avg, epoch)
             self.logger.add_scalar('Global/Average_PSNR', global_psnr / m, epoch)
-            if (epoch + 1) % 5 == 0 or epoch == 0:
+            if (epoch + 1) % 3 == 0 or epoch == 0:
                 global_test_psnr, global_psnr_noisy = self.global_test_psnr()
                 self.logger.add_scalar('Global/Test_PSNR', global_test_psnr, epoch)
                 self.logger.add_scalar('Global/Test_PSNR_Noisy', global_psnr_noisy, epoch)
