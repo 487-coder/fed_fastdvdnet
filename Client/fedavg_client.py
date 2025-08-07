@@ -2,8 +2,7 @@ import copy
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from utils import save_model_checkpoint
-
+from utils import save_model_checkpoint, orthogonal_conv_weights
 
 from utils import normalize_augment
 from Client.ClientBase import Client
@@ -28,11 +27,12 @@ class ClientFedAvg(Client):
         self.ctrl_fr_idx = (self.args.temp_psz - 1) // 2
         self.criterion = nn.MSELoss(reduction='sum').to(device)
 
-    def update_weights(self, global_round):
+    def update_weights(self, global_round,lr):
         self.model.to(self.device)
         self.model.train()
 
-        optimizer = optim.Adam(self.model.parameters(), lr=self.args.lr)
+        optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=0.9)
+
         criterion = self.criterion.to(self.device)
 
         epoch_loss = []
@@ -72,6 +72,8 @@ class ClientFedAvg(Client):
                batch_loss.append(loss.item())
 
            epoch_loss.append(sum(batch_loss) / len(batch_loss))
+           self.model.apply(orthogonal_conv_weights)
+
 
            save_model_checkpoint(
                 model=self.model,

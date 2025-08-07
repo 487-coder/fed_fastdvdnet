@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision.transforms import Compose
+import logging
 
 import cv2
 from collections import defaultdict
@@ -249,3 +250,37 @@ def save_model_checkpoint(model, config, optimizer, train_pars, epoch, role="glo
         torch.save(save_dict, epoch_ckpt_path)
 
     del save_dict
+
+
+def init_logger_test(result_dir):
+    result_dir = Path(result_dir)
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    log_path = result_dir / 'log.txt'
+
+    logger = logging.getLogger('testlog')
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(log_path, mode='w', encoding='utf-8')
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    fh.setFormatter(formatter)
+
+    if not logger.hasHandlers():
+        logger.addHandler(fh)
+
+    return logger
+
+def orthogonal_conv_weights(layer):
+    if not isinstance(layer, nn.Conv2d):
+        return
+    weight_tmp = layer.weight.data.clone()
+    c_out, c_in, kh, kw = weight_tmp.shape
+    dtype = weight_tmp.dtype
+    weight_flat = weight_tmp.permute(2, 3, 1, 0).contiguous().view(-1, c_out)
+    try:
+        U, _, V = torch.linalg.svd(weight_flat, full_matrices=False)
+        weight_ortho = torch.matmul(U, V)
+
+        weight_new = weight_ortho.view(kh, kw, c_in, c_out).permute(3, 2, 0, 1).contiguous()
+        layer.weight.data.copy_(weight_new.to(dtype))
+    except RuntimeError as e:
+        print(f"SVD failed for {layer.__class__.__name__}: {e}")

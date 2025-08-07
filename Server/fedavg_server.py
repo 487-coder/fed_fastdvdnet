@@ -26,6 +26,7 @@ class ServerFedAvg(Server):
         train_loss = []
         global_weights = self.global_model.state_dict()
         for epoch in tqdm(range(self.args.num_epochs)):
+            current_lr = self.args.lr * (0.1 ** (epoch // 2))
             #test_accuracy = 0
             global_psnr = 0
             local_weights, local_losses = [], []
@@ -35,7 +36,7 @@ class ServerFedAvg(Server):
             for idx in idxs_users:
                 if self.args.upload_model == True:
                     self.LocalModels[idx].load_model(global_weights)
-                w, loss = self.LocalModels[idx].update_weights(global_round=epoch)
+                w, loss = self.LocalModels[idx].update_weights(global_round=epoch,current_lr=current_lr)
                 local_losses.append(copy.deepcopy(loss))
                 local_weights.append(copy.deepcopy(w))
                 local_psnr = self.LocalModels[idx].test_psnr()
