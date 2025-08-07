@@ -36,7 +36,7 @@ class ServerFedAvg(Server):
             for idx in idxs_users:
                 if self.args.upload_model == True:
                     self.LocalModels[idx].load_model(global_weights)
-                w, loss = self.LocalModels[idx].update_weights(global_round=epoch,current_lr=current_lr)
+                w, loss = self.LocalModels[idx].update_weights(global_round=epoch,lr=current_lr)
                 local_losses.append(copy.deepcopy(loss))
                 local_weights.append(copy.deepcopy(w))
                 local_psnr = self.LocalModels[idx].test_psnr()

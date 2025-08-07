@@ -72,10 +72,11 @@ class ClientFedAvg(Client):
                batch_loss.append(loss.item())
 
            epoch_loss.append(sum(batch_loss) / len(batch_loss))
-           self.model.apply(orthogonal_conv_weights)
+
+        self.model.apply(orthogonal_conv_weights)
 
 
-           save_model_checkpoint(
+        save_model_checkpoint(
                 model=self.model,
                 config={
                    'log_dir': self.args.save_dir,
@@ -86,7 +87,7 @@ class ClientFedAvg(Client):
                 epoch=global_round,
                 role="client",
                 client_id=self.idx
-               )
+            )
 
         return self.model.state_dict(), sum(epoch_loss) / len(epoch_loss)
 

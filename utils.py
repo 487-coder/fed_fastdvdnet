@@ -276,6 +276,9 @@ def orthogonal_conv_weights(layer):
     c_out, c_in, kh, kw = weight_tmp.shape
     dtype = weight_tmp.dtype
     weight_flat = weight_tmp.permute(2, 3, 1, 0).contiguous().view(-1, c_out)
+    print(f"\n[Layer] Conv2d with shape: {layer.weight.shape}")
+    print(f" - Flattened shape: {weight_flat.shape}")
+    print(f" - Max: {weight_flat.max().item():.6f}, Min: {weight_flat.min().item():.6f}")
     try:
         U, _, V = torch.linalg.svd(weight_flat, full_matrices=False)
         weight_ortho = torch.matmul(U, V)
